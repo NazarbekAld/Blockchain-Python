@@ -1,7 +1,7 @@
 import socket
 import threading
-import time
 import os
+import pickle
 
 from Crypto.PublicKey import RSA
 from blockchain.node import Node
@@ -36,11 +36,11 @@ Users : list[Node] = []
 """
 
 # Safe connection:
-RequirePubKey = { "message": "givepubkey" }
+RequirePubKey = { 'message': 'givepubkey' }
 
 
 
-def Connect(ip="127.0.0.1", port=8027):
+def Connect(ip="127.0.0.1", port=2212):
     print(("IP: " + ip), ("Port: " + str(port)), "Binding your sock...", sep="\n")
     """
         Binding
@@ -57,11 +57,11 @@ def gettingSocks():
             i.start()
         c, addr = s.accept()
         print ('Got connection from', addr)
-        c.send(json.dumps(RequirePubKey).encode('utf-8'))
+        c.send(json.JSONEncoder().encode(RequirePubKey).encode('utf-8'))
         Users.append(Node(c, addr))
 
 if __name__ == '__main__':
     Threads = HashMap()
-    Connect()
+    Connect(port=6969)
     Threads.put("gettingSocks", threading.Thread(target=gettingSocks))
     Threads.get("gettingSocks").start()

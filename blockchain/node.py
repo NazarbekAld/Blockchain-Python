@@ -1,3 +1,4 @@
+import json
 import socket
 import threading
 
@@ -7,7 +8,8 @@ from Crypto.PublicKey.RSA import RsaKey
 # Node
 
 class Node(threading.Thread):
-    def __init__ (self, socket : socket.socket, address : tuple):
+    def __init__ (self, socket : socket.socket, address):
+        threading.Thread.__init__(self)
         self.__socks = socket
         self.__address = address
         self.__publickey : RsaKey = None
@@ -19,4 +21,11 @@ class Node(threading.Thread):
         self.__publickey = key
     def run(self):
         while True:
-            self.__socks.recv(3072).decode('utf-8')
+            packet = self.__socks.recv(3072).decode()
+            packet : dict = json.JSONDecoder().decode(packet)
+            if packet.get('message') == 'pubkey':
+                self.__publickey = RSA.importKey(packet.get('key'))
+            if self.__publickey == None:
+                return
+
+            print(packet)
