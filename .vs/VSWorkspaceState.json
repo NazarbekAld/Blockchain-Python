@@ -1,7 +1,8 @@
 {
   "ExpandedNodes": [
-    ""
+    "",
+    "\\blockchain"
   ],
-  "SelectedNode": "\\main.py",
+  "SelectedNode": "\\blockchain\\block.py",
   "PreviewInSolutionExplorer": false
 }
