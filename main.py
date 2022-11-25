@@ -1,7 +1,6 @@
 import socket
 import threading
 import os
-import pickle
 
 from Crypto.PublicKey import RSA
 from blockchain.node import Node
@@ -12,13 +11,18 @@ import json
 """
     Shhh! Keep it secret.
 """
-if not (os.path.exists("public.pem") and os.path.exists("private.pem")):
-    print("No keys exist on this directory. Generating new one...")
-    KEY = RSA.generate(1028)
-    with open("private.pem", "w") as file:
-        file.write(KEY.export_key().decode())
-    with open("public.pem", "w") as file:
-        file.write(KEY.public_key().export_key().decode())
+def getKey():
+    if not (os.path.exists("public.pem") and os.path.exists("private.pem")):
+        print("No keys exist on this directory. Generating new one...")
+        KEY = RSA.generate(1028)
+        with open("private.pem", "w") as file:
+            file.write(KEY.export_key().decode())
+        with open("public.pem", "w") as file:
+            file.write(KEY.public_key().export_key().decode())
+        return KEY
+    with open('private.pem', "r") as file:
+        return RSA.importKey(file.read())
+
     
 
 """
@@ -36,7 +40,7 @@ Users : list[Node] = []
 """
 
 # Safe connection:
-RequirePubKey = { 'message': 'givepubkey' }
+RequirePubKey = { 'message': 'givepubkey', 'key': getKey().public_key().export_key().decode()}
 
 
 
@@ -54,14 +58,25 @@ def gettingSocks():
     print("Getting users...")
     while True:
         for i in Users:
-            i.start()
+            try:
+                i.start()
+            except Exception as e:
+                del(i)
+
         c, addr = s.accept()
         print ('Got connection from', addr)
         c.send(json.JSONEncoder().encode(RequirePubKey).encode('utf-8'))
         Users.append(Node(c, addr))
+def inputStats():
+    while True:
+        if input() == 'exit':
+            exit(0)
 
 if __name__ == '__main__':
+    getKey()
     Threads = HashMap()
     Connect(port=6969)
     Threads.put("gettingSocks", threading.Thread(target=gettingSocks))
+    Threads.put("input", threading.Thread(target=inputStats))
     Threads.get("gettingSocks").start()
+    Threads.get("input").start()

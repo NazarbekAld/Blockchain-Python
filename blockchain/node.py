@@ -25,7 +25,4 @@ class Node(threading.Thread):
             packet : dict = json.JSONDecoder().decode(packet)
             if packet.get('message') == 'pubkey':
                 self.__publickey = RSA.importKey(packet.get('key'))
-            if self.__publickey == None:
-                return
-
             print(packet)

@@ -24,6 +24,7 @@ def getKey() -> RsaKey:
     return KEY
 
 socks = sock.socket(sock.AF_INET, sock.SOCK_STREAM)
+sockskey : RsaKey = None
 
 def connect(ip="127.0.0.1", port=2212):
     socks.connect((ip, port))
@@ -40,6 +41,8 @@ def packet():
             print(type(packet))
 
         if packet.get('message') == "givepubkey":
+            sockskey = RSA.importKey(packet.get('key'))
+            print(sockskey.export_key().decode())
             socks.send(json.JSONEncoder().encode({"message": "pubkey", 'key': getKey().public_key().export_key().decode()}).encode('utf-8'))
 
 

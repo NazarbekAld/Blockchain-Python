@@ -26,8 +26,8 @@ class Transaction():
             return map
         elif returns == "dict":
             return {
-                "Payer": self.__payer.getAddress().export_key(),
-                "Payee": self.__payee.getAddress().export_key(),
+                "Payer": self.__payer.getAddress().export_key().decode(),
+                "Payee": self.__payee.getAddress().export_key().decode(),
                 "Amount": self.__amount,
                 "Signature": self.__signature.get().hexdigest()
                 }
